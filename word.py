@@ -13,18 +13,6 @@ for index in range(len(words)):
 	else:
 		dict[current] = 1
 
-max_name = ''
-max_num = 0
-
-for index in range(len(dict)):	
-	for word in dict:
-		if dict[word] > max_num:
-			max_name = word
-			print dict[word]
-	print str(dict[max_name])+ "  ___  "  + max_name
-	del dict[max_name]
-	max_name = ''
-	max_num = 0
-
-while not is_empty(d)
-	
+for word in sorted(dict, key=dict.__getitem__, reverse = True):
+	if dict[word] > 30:
+		print word + " "  +str(dict[word])
