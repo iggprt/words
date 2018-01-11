@@ -1,5 +1,6 @@
 import sqlite3
 import re
+import random
 
 conn = sqlite3.connect('words.db')
 conn.text_factory = str
@@ -28,34 +29,36 @@ def search_word_in_table(word):
 	return found[0][0]
 
 def insert_word(word):
-	if search_word_in_table(word):
+	word_id = search_word_in_table(word)
+	if word_id:
 		c.execute("select frequency from word_tab where word = :w",{'w':word})
 		freq = int(c.fetchall()[0][0])
 		c.execute("""update word_tab 
 					set frequency = :f
 					where word_id = :id""",{
 					'f':freq+1,
-					'id':search_word_in_table(word)})
-		conn.commit()
+					'id':word_id})
 	else:
 		c.execute("insert into word_tab (word, frequency) values(:w, 1)",{'w':word})
-		conn.commit()
-		
-		
-		 
 	
-
-
-"""	
-file = open('troubles.txt','r')
+	conn.commit()
+		
+reset_tables()		
+file = open('trouble.txt','r')
+i = 0
+num_lines = sum(1 for line in file)
+file.seek(0)
 for line in file:
-	word_list = line.split()
-	for word in word_list:
-		if search_word_in_table(word):
-			pass
-"""		
-update_freq('castroane')
-
+	i += 1
+	words = line.split()
+	for entry in words:
+		word = striped_word(entry).lower()
+		if word == '':
+			continue
+		insert_word(word)
+		
+	if random.randint(0,30) == 13:
+		print str(i) + "/" + str(num_lines)
 """	
 
 content = file.read()
