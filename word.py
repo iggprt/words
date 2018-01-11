@@ -2,7 +2,7 @@ import sqlite3
 import re
 import random
 
-conn = sqlite3.connect('words.db')
+conn = sqlite3.connect('english_words.db')
 conn.text_factory = str
 c = conn.cursor()
 
@@ -28,26 +28,28 @@ def search_word_in_table(word):
 		return False
 	return found[0][0]
 
-def insert_word(word):
-	word_id = search_word_in_table(word)
-	if word_id:
-		c.execute("select frequency from word_tab where word = :w",{'w':word})
-		freq = int(c.fetchall()[0][0])
-		c.execute("""update word_tab 
+def update_word(word_id):
+	c.execute("select frequency from word_tab where word_id = :id",{'id':word_id})
+	freq = int(c.fetchall()[0][0])
+	c.execute("""update word_tab 
 					set frequency = :f
 					where word_id = :id""",{
 					'f':freq+1,
 					'id':word_id})
-	else:
-		c.execute("insert into word_tab (word, frequency) values(:w, 1)",{'w':word})
-	
 	conn.commit()
-		
-reset_tables()		
-file = open('trouble.txt','r')
+	
+def insert_word(word):
+	c.execute("insert into word_tab (word, frequency) values(:w, 1)",{'w':word})
+	conn.commit()
+
+	
+	
+file = open('troubles.txt','r')
 i = 0
 num_lines = sum(1 for line in file)
 file.seek(0)
+entrys = 0
+inserted = 0
 for line in file:
 	i += 1
 	words = line.split()
@@ -55,10 +57,20 @@ for line in file:
 		word = striped_word(entry).lower()
 		if word == '':
 			continue
-		insert_word(word)
+		id = search_word_in_table(word)
+		if id:
+			update_word(id)
+			entrys += 1
+		else:
+			insert_word(word)
+			inserted += 1
+			print word
 		
-	if random.randint(0,30) == 13:
-		print str(i) + "/" + str(num_lines)
+	if random.randint(0,10) == 3:
+		print "progr: " + str(i) + "/" + str(num_lines) + " ___ new/all: " + str(inserted) + '/' + str(entrys+inserted)
+		entrys = 0
+		inserted = 0
+print str(i) + "/" + str(num_lines) + " " + str(inserted) + '/' + str(entrys+inserted)
 """	
 
 content = file.read()
