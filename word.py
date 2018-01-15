@@ -9,7 +9,7 @@ c = conn.cursor()
 def create_tables():
 	c.execute("CREATE TABLE IF NOT EXISTS word_tab (word_id integer primary key autoincrement, word, frequency)")
 	c.execute("CREATE TABLE IF NOT EXISTS word_found_tab (word_found_id integer primary key autoincrement, word_found, word_id)")
-	conn.commit()
+	#conn.commit()
 	
 def reset_tables():
 	create_tables()
